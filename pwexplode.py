@@ -327,12 +327,12 @@ def get_copyoffset(bitstring):
 # This function takes a compressed bytestring and decompresses it; returns the uncompressed data if successful
 def explode(compressedstring):
     # compressedstring should be a string...
-    if type(compressedstring) is not str:
-        raise RuntimeError("explode(compressedstring): compressedstring is not a str but %s.", type(compressedstring))
+    if type(compressedstring) is not bytes:
+        raise RuntimeError("explode(compressedstring): compressedstring is not of type 'bytes' but %s." % type(compressedstring))
 
     # Header is two bytes
-    codedliterals = struct.unpack('<B', compressedstring[0])[0]  # First byte is 0 if literals are uncoded, otherwise 1
-    maxdictlength = struct.unpack('<B', compressedstring[1])[0]  # Second byte is 4, 5, or 6 (max size of dictionary)
+    codedliterals = struct.unpack('<B', compressedstring[0:1])[0]  # First byte is 0 if literals are uncoded, otherwise 1
+    maxdictlength = struct.unpack('<B', compressedstring[1:2])[0]  # Second byte is 4, 5, or 6 (max size of dictionary)
 
     # Print
     debug_print("Literals are %s. Size of dictionary is %d (%d)." % ("coded" if codedliterals == 1 else "non-coded",
@@ -345,8 +345,8 @@ def explode(compressedstring):
 
     # Create a bit stream, i.e. a string of bits...
     bitstream = ""
-    for entry in compressedstring:
-        bitstream += "{0:08b}".format(struct.unpack('>B', entry)[0])[::-1]
+    for i in range(len(compressedstring)):
+        bitstream += "{0:08b}".format(struct.unpack('>B', compressedstring[i:i+1])[0])[::-1]
 
     # Remove first 16 bits (i.e. 2 bytes = header)
     bitstream = bitstream[16:]
@@ -417,7 +417,7 @@ def explode(compressedstring):
                 debug_print("Found non-coded literal '%s' by reading in 8 bits" % pchar)
 
             # Add to output data
-            decompresseddata += bytes(pchar)
+            decompresseddata += pchar.encode("UTF-8")
 
         # Copy instructions!
         elif bit == '1':
@@ -512,12 +512,12 @@ def explode(compressedstring):
             debug_string = "Copying and filling in %d bytes from %d to %d: " % (length, sourcepos, targetpos)
 
             # Copy exactly 'length' number of bytes!
-            for i in xrange(length):
+            for i in range(length):
                 # Get byte to copy
-                decompresseddata += decompresseddata[sourcepos]
+                decompresseddata += decompresseddata[sourcepos:sourcepos+1]
 
                 # Add to debug string
-                debug_string += decompresseddata[sourcepos]
+                debug_string += decompresseddata[sourcepos:sourcepos+1].decode()
 
                 # Move forward
                 sourcepos += 1
@@ -544,24 +544,28 @@ def explode(compressedstring):
 # Someone calling this file directly? Then let's print some tests!
 if __name__ == '__main__':
     # Only for this use we define this test function
-    def runtest(inputdata, outputdata, positivecounter, number):
+    def runtest(inputdata, expectedoutput, positivecounter, number):
         # Decompress it!
-        result = explode(inputdata) == outputdata
+        outputdata = explode(inputdata) 
+        result = outputdata == expectedoutput
 
         # Print results for user
         print("Test %02d: '%s' should decompress to '%s'. Result = %s" %
-              (number + 1, inputdata, outputdata, "True" if result else 'False'))
+              (number + 1, inputdata, expectedoutput, "True" if result else 'False'))        
 
         # Counting successful tests
         if result:
             positivecounter += 1
+        else:
+            print("Output gave: ", outputdata)
 
         return positivecounter, number + 1
 
 
     # Start test program
     print("pwexplode.py - implementation of the PKWARE Data Compression Library format (imploding) for byte streams")
-    print("Copyright (C) 2017 by Sven Kochmann")
+    print("Copyright (C) 2019 by Sven Kochmann")
+    print("")
     print("This program comes with ABSOLUTELY NO WARRANTY; This is free software, and you are welcome to redistribute")
     print("it under certain conditions; please see source code for details.")
     print("")
@@ -570,16 +574,18 @@ if __name__ == '__main__':
     success, counter = 0, 0
 
     # All the tests
-    success, counter = runtest('\x00\x04\x82\x24\x25\x8F\x80\x7F', 'AIAIAIAIAIAIA', success, counter)
-    success, counter = runtest('\x01\x04\x62\x41\xF2\x08\xF8\x07', 'AIAIAIAIAIAIA', success, counter)
-    success, counter = runtest('\x01\x04\x02\x6F\x5A\x08\xB6\x67\xE8\x86\x6A\xA9\x8A\x6D\x28'
-                               '\x5E\x56\x6D\xCD\x5B\x5B\x6C\x47\x73\x18\xB6\x8A\x17\xF0\x0F',
-                               'I like consistent user interfaces.', success, counter)
-    success, counter = runtest('\x01\x06\x50\x6C\xD3\xD4\x3D\xBC\xAE\x99\x74\x50\x7A\x28\x3A'
-                               '\xBC\x77\x34\xDB\x83\xD3\x65\x7C\xAF\xE8\x74\x07\x1C\x88\x7B'
-                               '\x16\xC5\x52\xFD\x17\x1C\x0F\xC1\xD6\xC0\xF9\xB5\x31\xA8\x1B'
-                               '\xB4\xC1\x2B\x78\x01\xFF',
-                               'Hello world! How are you, today? This is a very long text.', success, counter)
+    success, counter = runtest(b'\x00\x04\x82\x24\x25\x8F\x80\x7F', b'AIAIAIAIAIAIA', success, counter)
+    success, counter = runtest(b'\x01\x04\x62\x41\xF2\x08\xF8\x07', b'AIAIAIAIAIAIA', success, counter)
+    success, counter = runtest(b'\x01\x04\x02\x6F\x5A\x08\xB6\x67\xE8\x86\x6A\xA9\x8A\x6D\x28'
+                               b'\x5E\x56\x6D\xCD\x5B\x5B\x6C\x47\x73\x18\xB6\x8A\x17\xF0\x0F',
+                               b'I like consistent user interfaces.', success, counter)
+    success, counter = runtest(b'\x01\x06\x50\x6C\xD3\xD4\x3D\xBC\xAE\x99\x74\x50\x7A\x28\x3A'
+                               b'\xBC\x77\x34\xDB\x83\xD3\x65\x7C\xAF\xE8\x74\x07\x1C\x88\x7B'
+                               b'\x16\xC5\x52\xFD\x17\x1C\x0F\xC1\xD6\xC0\xF9\xB5\x31\xA8\x1B'
+                               b'\xB4\xC1\x2B\x78\x01\xFF',
+                               b'Hello world! How are you, today? This is a very long text.', success, counter)
 
     # Print results
     print("%d/%d tests performed successfully." % (success, counter))
+
+
