@@ -17,23 +17,29 @@
 # You  should  have  received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# Note: this program is mostly based on the description of Ben Rudiak-Gould in the comp.compression group:
+# Note: this program is mostly based on the description of Ben Rudiak-
+# Gould in the comp.compression group:
 # https://groups.google.com/forum/#!msg/comp.compression/M5P064or93o/W1ca1-ad6kgJ
 # and zlib's blast.c:
 # https://github.com/madler/zlib/blob/master/contrib/blast/blast.c#L150
 
-# It should be noted that there is a small mistake in Ben's example. He writes 00 04 82 24 25 c7 80 7f should
-# decompress to 'AIAIAIAIAIAIA'; However, testing this with my implementation failed. I realized that there is
-# a small mistake in the sequence itself, when I created it with the official pkware ziptool (see below for tests)
-# and the sequence turned out to be actually 00 04 82 24 25 8f 80 7f (notice the difference at byte 6). This will
+# It should be noted that  there is  a small mistake in Ben's example. 
+# He uses  00 04 82 24 25 c7 80 7f as example, which should decompress 
+# to 'AIAIAIAIAIAIA'.  However,  testing  this with  my implementation 
+# failed.  When  I created it  with  the official pkware ziptool  (see 
+# below  for  tests),  the   sequence  turned  out   to  be   actually 
+# 00 04 82 24 25 8f 80 7f (notice the difference at byte 6). This will
 # successfully decompress to 'AIAIAIAIAIAIA'.
 
-# Instead of pure dictionaries, this package uses functions to provide the data of the tables necessary to decompress
-# streams. Advantage: functions are 'read-only' and can provide error feedback. Disadvantage: overhead, runtime. But
-# it is considered to be minimal. In order to reduce the extra time a little bit, all tables are 'complete', i.e. each
-# entry just needs to be extracted and does not need to be calculated. The difference is minimal and practical non-
-# existant when accessing a function one time only; but these functions can be called hundred or thousand times per
-# stream.
+# Instead of pure dictionaries, this package uses functions to provide 
+# the data of  the tables necessary  to decompress streams. Advantage: 
+# functions are 'read-only' and can provide error feedback. 
+# Disadvantage: overhead, runtime. But it is considered to be minimal. 
+# In order  to reduce  the extra time   a little bit,  all tables  are 
+# 'complete',  i.e.  each entry  just needs  to be extracted  but  not 
+# calculated.  The difference  is minimal  and  practical non-existant 
+# when accessing a function one time only;  but these functions can be 
+# called hundred or thousand times per stream.
 
 # Import stuff
 import struct
