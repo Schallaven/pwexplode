@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# pwexplode.py - implementation of the PKWARE Data Compression Library format (imploding) for byte streams
+# pwexplode.py - implementation of the PKWARE Data Compression Library 
+# format (imploding) for byte streams
 # Copyright (C) 2019 by Sven Kochmann
 
 # This program is free software: you can redistribute it and/or modify
