@@ -521,7 +521,7 @@ def explode(compressedstring):
                 decompresseddata += decompresseddata[sourcepos:sourcepos+1]
 
                 # Add to debug string
-                debug_string += decompresseddata[sourcepos:sourcepos+1].decode()
+                debug_string += repr(decompresseddata[sourcepos:sourcepos+1])
 
                 # Move forward
                 sourcepos += 1
