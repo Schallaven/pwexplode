@@ -34,4 +34,9 @@ Calling pwexplode directly will run some tests:
 $ ./pwexplode.py
 ```
 
+# Contributors
+
+* [KOLANICH](https://github.com/KOLANICH)
+
+
 

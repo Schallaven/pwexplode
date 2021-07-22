@@ -568,10 +568,12 @@ if __name__ == '__main__':
 
     # Start test program
     print("pwexplode.py - implementation of the PKWARE Data Compression Library format (imploding) for byte streams")
-    print("Copyright (C) 2019 by Sven Kochmann")
+    print("Copyright (C) 2021 by Sven Kochmann")
     print("")
     print("This program comes with ABSOLUTELY NO WARRANTY; This is free software, and you are welcome to redistribute")
     print("it under certain conditions; please see source code for details.")
+    print("")
+    print("Contributors: KOLANICH")
     print("")
 
     print("Running tests:")
