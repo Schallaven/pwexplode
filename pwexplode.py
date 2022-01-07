@@ -66,7 +66,7 @@ def is_bitstring(bitstring):
 
     # Check
     for character in bitstring:
-        if character is not '0' and character is not '1':
+        if character != '0' and character != '1':
             return False
 
     # Passed the check
