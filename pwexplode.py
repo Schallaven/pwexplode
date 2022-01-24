@@ -66,7 +66,7 @@ def is_bitstring(bitstring):
 
     # Check
     for character in bitstring:
-        if character is not '0' and character is not '1':
+        if character != '0' and character != '1':
             return False
 
     # Passed the check
@@ -535,7 +535,7 @@ def explode(compressedstring):
 
         # Error, should not happen
         if pos >= len(bitstream):
-            raise RuntimeErrro("explode(): Tried to read bit #%d behind the length of the bitstream (%d)"
+            raise RuntimeError("explode(): Tried to read bit #%d behind the length of the bitstream (%d)"
                                % (pos+1, len(bitstream)))
 
     # Print
