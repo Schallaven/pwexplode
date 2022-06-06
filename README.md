@@ -37,6 +37,7 @@ $ ./pwexplode.py
 # Contributors
 
 * [KOLANICH](https://github.com/KOLANICH)
+* [sourcekris](https://github.com/sourcekris)
 
 
 
