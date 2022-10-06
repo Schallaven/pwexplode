@@ -3,7 +3,7 @@
 
 # pwexplode.py - implementation of the PKWARE Data Compression Library 
 # format (imploding) for byte streams
-# Copyright (C) 2019 by Sven Kochmann
+# Copyright (C) 2022 by Sven Kochmann
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -420,8 +420,8 @@ def explode(compressedstring):
                 # Print
                 debug_print("Found non-coded literal '%s' by reading in 8 bits" % pchar)
 
-            # Add to output data
-            decompresseddata += pchar.encode("UTF-8")
+            # Add a _single_ byte to output data
+            decompresseddata += struct.pack('B', ord(pchar))
 
         # Copy instructions!
         elif bit == '1':
