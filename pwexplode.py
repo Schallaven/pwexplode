@@ -573,7 +573,7 @@ if __name__ == '__main__':
     print("This program comes with ABSOLUTELY NO WARRANTY; This is free software, and you are welcome to redistribute")
     print("it under certain conditions; please see source code for details.")
     print("")
-    print("Contributors: KOLANICH")
+    print("Contributors: KOLANICH, sourcekris")
     print("")
 
     print("Running tests:")
