@@ -55,10 +55,7 @@ p = thisDir / subpath
 
 list_files = []
 
-def removeMetaFiles(filelist: typing.List[Path]) -> typing.List[Path]:
-    return [file for file in filelist if not file.name in ["License.md", "meta.ftsmeta", "meta.json", "ReadMe.txt", "ReadMe.md"]]
-
-for file in p.rglob("*"):
+for file in p.iterdir():
     if file.is_dir():
         meta = list(file.glob("meta.json"))
 
@@ -68,23 +65,23 @@ for file in p.rglob("*"):
 
             # Since sorted, same indices should point to the same
             # pair of files
-            rawFiles = removeMetaFiles(sorted(list(file.glob("*" + metadata["rawExt"]))))
-            decFiles = removeMetaFiles(sorted(list(file.glob("*" + metadata["processedExt"]))))
+            decFiles = sorted(file.glob("*." + metadata["processedExt"]))
 
-            # Hack: remove dec files from raw files (there is the case of no extension given
-            # for rawExt of the unshield-dataset. Not optimal. (Also in this case the original
-            # dataset has processedExt and rawExt exchanged; as of 2021-07-22)
-            rawFiles = [file for file in rawFiles if not file in decFiles]
+            def extReplacer(fn: Path) -> Path:
+                 rE = metadata["rawExt"]
+                 if rE:
+                    return fn.parent / (fn.stem + "." + rE)
 
-            if len(rawFiles) == len(decFiles):
-                for i in range(len(rawFiles)):
-                    basename = rawFiles[i].name[:len(rawFiles[i].name) - len(metadata["rawExt"])]
-                    list_files.append({"basename": basename, "imploded": str(decFiles[i]), "exploded": str(rawFiles[i])})                    
-                    print("\tAdded %s[%s, %s]." 
-                            % (basename, metadata["rawExt"], metadata["processedExt"]))
-            else:
-                print("There are %d raw files but %d decoded files. That does not fit." 
-                        % (len(rawFiles), len(decFiles)))
+                 return fn.parent / fn.stem
+
+            rawFiles = [extReplacer(el) for el in decFiles]
+            pairs = tuple(p for p in zip(rawFiles, decFiles) if p[0].is_file() and p[1].is_file())
+
+            for rawFile, decFile in pairs:
+                basename = decFile.stem
+                list_files.append({"suiteName": file.name, "testName": basename, "imploded": str(decFile), "exploded": str(rawFile)})
+                print(("\tAdded " + ("%s.{%s,%s}" if metadata["rawExt"] else "%s{%s,.%s}") + ".") 
+                    % ((basename, metadata["rawExt"], metadata["processedExt"])))
 
 print("")
 
@@ -108,7 +105,7 @@ def generate_test(imploded: str, exploded: str) -> typing.Callable:
 
 # Generate the Testcases and add a method each for each entry of the list
 for filepair in list_files:
-    test_name = 'test_%s' % filepair["imploded"]
+    test_name = 'test_%s:%s' % (filepair["suiteName"], filepair["testName"])
     _test = generate_test(filepair["imploded"], filepair["exploded"])
     setattr(TestSuperCase, test_name, _test)
 
