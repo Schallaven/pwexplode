@@ -22,6 +22,7 @@
 # collection  prepared  by  KOLANICH,  see:
 # https://github.com/implode-compression-impls/implode_test_files
 
+import typing
 import json
 from pathlib import Path
 import sys
@@ -54,7 +55,7 @@ p = thisDir / subpath
 
 list_files = []
 
-def removeMetaFiles(filelist):
+def removeMetaFiles(filelist: typing.List[Path]) -> typing.List[Path]:
     return [file for file in filelist if not file.name in ["License.md", "meta.ftsmeta", "meta.json", "ReadMe.txt", "ReadMe.md"]]
 
 for file in p.rglob("*"):
@@ -91,7 +92,7 @@ print("")
 class TestSuperCase(unittest.TestCase):
     pass
 
-def test_generator(imploded, exploded):
+def test_generator(imploded: str, exploded: str) -> typing.Callable:
     def test(self):
         imploded_data = b""
         exploded_data = b""
