@@ -92,7 +92,7 @@ print("")
 class TestSuperCase(unittest.TestCase):
     pass
 
-def test_generator(imploded: str, exploded: str) -> typing.Callable:
+def generate_test(imploded: str, exploded: str) -> typing.Callable:
     def test(self):
         imploded_data = b""
         exploded_data = b""
@@ -109,8 +109,8 @@ def test_generator(imploded: str, exploded: str) -> typing.Callable:
 # Generate the Testcases and add a method each for each entry of the list
 for filepair in list_files:
     test_name = 'test_%s' % filepair["imploded"]
-    test = test_generator(filepair["imploded"], filepair["exploded"])
-    setattr(TestSuperCase, test_name, test)
+    _test = generate_test(filepair["imploded"], filepair["exploded"])
+    setattr(TestSuperCase, test_name, _test)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
