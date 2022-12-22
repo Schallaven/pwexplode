@@ -37,7 +37,8 @@ else:
     
 # Small  hack  to make  sure that  the main module (pwexplode)  can be 
 # imported despite the fact that it is in the parent directory
-parentDir = Path(__file__).resolve().absolute().parent.parent
+thisDir = Path(__file__).resolve().absolute().parent
+parentDir = thisDir.parent
 sys.path.insert(0, str(parentDir))
 import pwexplode
 
@@ -49,7 +50,7 @@ import pwexplode
 # is according to the fileTestSuite specs (since the data set uses it)
 # and can be found at: https://github.com/fileTestSuite/fileTestSuite
 subpath = "testDataset/"
-p = Path(subpath)
+p = thisDir / subpath
 
 list_files = []
 
