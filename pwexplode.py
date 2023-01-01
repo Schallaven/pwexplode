@@ -442,6 +442,8 @@ def explode(compressedstring):
 
                 # Add another bit
                 bitbuf = bitstream[pos:pos + len(bitbuf) + 1]
+                if not len(bitbuf):
+                    break
 
             # Move further
             pos += len(bitbuf)
@@ -476,6 +478,8 @@ def explode(compressedstring):
 
                 # Add another bit and try again
                 bitbuf = bitstream[pos:pos + len(bitbuf) + 1]
+                if not len(bitbuf):
+                    break
 
             # Move further
             pos += len(bitbuf)
@@ -499,14 +503,15 @@ def explode(compressedstring):
 
             # Read remaining bits and add them to the distance.
             bitbuf = bitstream[pos:pos + bitsleft][::-1]
-            dist += int(bitbuf, 2)
+            dist_delta = int(bitbuf, 2) if bitbuf else 0
+            dist += dist_delta
 
             # Move further
             pos += bitsleft
 
             # Print
             debug_print("The final distance is %d (raw: %d, shifted by %d: %d, added: %d)"
-                        % (dist, raw_dist, bitsleft, shifted_dist, int(bitbuf, 2)))
+                        % (dist, raw_dist, bitsleft, shifted_dist, dist_delta))
 
             # Let's copy finally!
             targetpos = len(decompresseddata)
