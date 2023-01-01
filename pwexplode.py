@@ -43,6 +43,7 @@
 # called hundred or thousand times per stream.
 
 # Import stuff
+import types, typing
 import struct
 import inspect
 
@@ -52,14 +53,15 @@ debugflag = False
 
 # Quick & dirty debug printing function; prints only if debugflag is True; gets line number and everything from
 # the currentframes _parent_ (f_back!)
-def debug_print(text):
+def debug_print(text: str) -> None:
     if debugflag:
-        cf = inspect.currentframe()
-        print("pwexplode.%s(), %d: %s" % (inspect.getframeinfo(cf.f_back)[2], cf.f_back.f_lineno, text))
+        cf = typing.cast(types.FrameType, inspect.currentframe())
+        bf = typing.cast(types.FrameType, cf.f_back)
+        print("pwexplode.%s(), %d: %s" % (inspect.getframeinfo(bf)[2], bf.f_lineno, text))
 
 
 # Checks if a string just consists of 0 and 1
-def is_bitstring(bitstring):
+def is_bitstring(bitstring: str) -> bool:
     # bitstring should be a string...
     if type(bitstring) is not str:
         raise RuntimeError("is_bitstring(bitstring): bitstring is not a str but %s.", type(bitstring))
@@ -74,7 +76,7 @@ def is_bitstring(bitstring):
 
 
 # This gives back the literals; returns a tuple of code and error; error is -1 if nothing is found
-def get_literals(bitstring):
+def get_literals(bitstring: str) -> typing.Tuple[int, int]:
     # bitstring should be a string...
     if type(bitstring) is not str:
         raise RuntimeError("get_literals(bitstring): bitstring is not a str but %s.", type(bitstring))
@@ -153,7 +155,7 @@ def get_literals(bitstring):
 
 
 # This gives back the copy-length; returns a tuple of length and error; error is -1 if nothing is found
-def get_copylength(bitstring):
+def get_copylength(bitstring: str) -> typing.Tuple[int, int]:
     # bitstring should be a string...
     if type(bitstring) is not str:
         raise RuntimeError("get_copylength(bitstring): bitstring is not a str but %s.", type(bitstring))
@@ -297,7 +299,7 @@ def get_copylength(bitstring):
 
 
 # This gives back the copy-offset; returns a tuple of offset and error; error is -1 if nothing is found
-def get_copyoffset(bitstring):
+def get_copyoffset(bitstring: str) -> typing.Tuple[int, int]:
     # bitstring should be a string...
     if type(bitstring) is not str:
         raise RuntimeError("get_copyoffset(bitstring): bitstring is not a str but %s.", type(bitstring))
@@ -329,7 +331,7 @@ def get_copyoffset(bitstring):
 
 
 # This function takes a compressed bytestring and decompresses it; returns the uncompressed data if successful
-def explode(compressedstring):
+def explode(compressedstring: bytes) -> bytes:
     # compressedstring should be a string...
     if type(compressedstring) is not bytes:
         raise RuntimeError("explode(compressedstring): compressedstring is not of type 'bytes' but %s." % type(compressedstring))
@@ -356,8 +358,8 @@ def explode(compressedstring):
     bitstream = bitstream[16:]
 
     # Print
-    debug_print("Compressed data (%d bytes) is '%s'" % (len(compressedstring), compressedstring))
-    debug_print("Bitstream data (%d bits) is '%s'" % (len(bitstream), bitstream))
+    debug_print("Compressed data (%d bytes) is '%r'" % (len(compressedstring), compressedstring))
+    debug_print("Bitstream data (%d bits) is '%r'" % (len(bitstream), bitstream))
 
     # Start decompression
     debug_print("Starting decompression...")
